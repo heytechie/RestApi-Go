@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/heytechie/Students-api-go/interal/config"
+	"github.com/heytechie/Students-api-go/interal/http/handlers/student"
 )
 
 func main() {
@@ -20,9 +21,7 @@ func main() {
 	//database setup
 	//setup router
 	router := http.NewServeMux()
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to students API"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 	//setup server
 	server := http.Server{
 		Addr:    cfg.Address,
