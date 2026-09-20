@@ -10,8 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/heytechie/Students-api-go/interal/config"
-	"github.com/heytechie/Students-api-go/interal/http/handlers/student"
+	"github.com/heytechie/Students-api-go/internal/config"
+	"github.com/heytechie/Students-api-go/internal/http/handlers/student"
+	"github.com/heytechie/Students-api-go/internal/storage/sqlite"
 )
 
 func main() {
@@ -19,9 +20,15 @@ func main() {
 	cfg := config.MustLoad()
 
 	//database setup
+	db, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatalf("Error setting up database: %s", err)
+	}
+	slog.Info("Storage initialised", slog.String("storage_path", cfg.StoragePath))
 	//setup router
 	router := http.NewServeMux()
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.New(db))
+	router.HandleFunc("GET /api/students/{id}", student.GetStudentById(db))
 	//setup server
 	server := http.Server{
 		Addr:    cfg.Address,
